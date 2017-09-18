@@ -110,13 +110,13 @@ func genWikiHead() string {
 func replaceImgPath(data string) string {
 
 	var imgPaths []string
-	re := regexp.MustCompile(`\!\[.*\]\(\.\S+\)`)
+	re := regexp.MustCompile(`\!\[.*\]\(\S+\)`)
 
 	matchs := re.FindAllString(data, -1)
 
 	for _, v := range matchs {
-		if strings.Contains(v, "(./") {
-			paths := strings.SplitN(v, "(.", 2)
+		if !strings.Contains(v, "http://") && !strings.Contains(v, "https://") {
+			paths := strings.SplitN(v, "(", 2)
 			paths[1] = paths[1][:len(paths[1])-1]
 			imgPaths = append(imgPaths, paths[1])
 		}
@@ -128,9 +128,11 @@ func replaceImgPath(data string) string {
 		sub := strings.SplitAfter(v, "/")
 		filename := sub[len(sub)-1]
 
-		rePath := "/" + title + "/" + filename
+		rePath := "../" + title + "/" + filename
 		data = strings.Replace(data, v, rePath, -1)
 	}
+
+	fmt.Println(data)
 
 	return data
 }
